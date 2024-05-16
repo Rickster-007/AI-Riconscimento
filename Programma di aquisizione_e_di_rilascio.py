@@ -7,11 +7,11 @@ import subprocess
 
 config = "yolov3.cfg"
 weights = "yolov3.weights"
-classes_file = "yolov3.txt"
+classes_file = "yolov3_tradotto.txt"
 
-target_classes1 = ["Person"]
+target_classes1 = ["Mela"]
 target_classes2 = ["Banana"]
-target_classes3 = ["Orange"]
+target_classes3 = ["Arancia"]
 
 target_classes = {
     tuple(target_classes1): 48,
@@ -34,15 +34,15 @@ COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 # Function to send a UR script command to the robot.............................................
 def URsetOuts (HOST, PORT, DO0, DO1, DO2):
-    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.connect((HOST, PORT))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((HOST, PORT))
     txt = "sec setOuts():\n  set_digital_out(0," + str(DO0) + ")\n  set_digital_out(1," + str(DO1) + ")\n  set_digital_out(2," + str(DO2) + ")\nend\nsetOuts()"
     msg = txt.encode("utf8")
     print("Sending:", msg)
-    #s.send(msg)
-    #data = s.recv(1024)
-    #s.close()
-    #print("Received", repr(data))
+    s.send(msg)
+    data = s.recv(1024)
+    s.close()
+    print("Received", repr(data))
 #.......................................
 def get_output_layers(net):
     layer_names = net.getLayerNames()
@@ -112,7 +112,7 @@ def analyze(image):
           
 
             # Check if the confidence is above the threshold and the class is in the target classes
-            if confidence > conf_threshold: #and class_id in target_classes:
+            if confidence > conf_threshold: 
                 # Calculate the bounding box coordinates
                 center_x = int(detection[0] * Width)
                 center_y = int(detection[1] * Height)
@@ -164,20 +164,23 @@ def analyze(image):
             print("Apple")
             URsetOuts(HOST, PORT, True, False, False)
             time.sleep(2)
-            return  # Interrompe l'analisi dell'immagine
+            URsetOuts(HOST, PORT, False, False, False)
+            
             
 
         elif detected_class in target_classes2:
             print("Banana")
             URsetOuts(HOST, PORT, False, True, False)
             time.sleep(2)
-            return  # Interrompe l'analisi dell'immagine
+            URsetOuts(HOST, PORT, False, False, False)
+            
             
         elif detected_class in target_classes3:
             print("Orange")
             URsetOuts(HOST, PORT, False, False, True)
             time.sleep(2)
-            return  # Interrompe l'analisi dell'immagine
+            URsetOuts(HOST, PORT, False, False, False)
+            
             
 
             
